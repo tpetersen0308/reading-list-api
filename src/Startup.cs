@@ -45,8 +45,6 @@ namespace reading_list_api
 
         cfg.TokenValidationParameters = new TokenValidationParameters()
         {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSettings:JwtSecret"])),
           ValidateIssuer = false,
           ValidateAudience = false
         };

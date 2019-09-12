@@ -8,10 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using reading_list_api.Models;
-
 
 namespace reading_list_api
 {
@@ -25,10 +21,6 @@ namespace reading_list_api
       .CreateLogger();
 
       Helpers.SimpleLogger.Log("Starting Service");
-
-      string json = File.ReadAllText(@"appsettings.json");
-      JObject o = JObject.Parse(@json);
-      AppSettings.appSettings = JsonConvert.DeserializeObject<AppSettings>(o["AppSettings"].ToString());
 
       CreateWebHostBuilder(args).Build().Run();
     }

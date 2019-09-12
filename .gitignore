@@ -2,3 +2,4 @@
 /src/obj/Debug/* 
 /test/bin/Debug/*
 /test/obj/Debug/*
+/src/appsettings.json
