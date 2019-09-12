@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using reading_list_api.Models;
+using reading_list_api.Services;
 using Npgsql.EntityFrameworkCore;
 
 namespace reading_list_api
@@ -50,6 +51,8 @@ namespace reading_list_api
           ValidateAudience = false
         };
       });
+
+      services.AddScoped<IAuthService, AuthService>();
 
     }
 
