@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using reading_list_api.Models;
+using Npgsql.EntityFrameworkCore;
 
 namespace reading_list_api
 {
@@ -30,6 +32,10 @@ namespace reading_list_api
       services.AddCors();
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+      services.AddEntityFrameworkNpgsql()
+        .AddDbContext<ReadingListApiContext>()
+        .BuildServiceProvider();
+
       services.AddAuthentication()
       .AddJwtBearer(cfg =>
       {
@@ -45,7 +51,6 @@ namespace reading_list_api
         };
       });
 
-      services.AddScoped<IAuthService, AuthService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

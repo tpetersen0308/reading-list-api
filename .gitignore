@@ -1,0 +1,4 @@
+/src/bin/Debug/*
+/src/obj/Debug/* 
+/test/bin/Debug/*
+/test/obj/Debug/*
