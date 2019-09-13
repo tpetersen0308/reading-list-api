@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using reading_list_api.Models;
 using reading_list_api.Services;
 
@@ -28,18 +29,23 @@ namespace reading_list_api
         .AddDbContext<ReadingListApiContext>()
         .BuildServiceProvider();
 
-      services.AddAuthentication()
-      .AddJwtBearer(cfg =>
+      services.AddAuthentication(options =>
       {
-        cfg.RequireHttpsMetadata = false;
-        cfg.SaveToken = true;
-
-        cfg.TokenValidationParameters = new TokenValidationParameters()
+        options.DefaultScheme = "Cookies";
+      }).AddCookie("Cookies", options =>
+      {
+        options.Cookie.Name = "auth_cookie";
+        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+        options.Events = new CookieAuthenticationEvents
         {
-          ValidateIssuer = false,
-          ValidateAudience = false
+          OnRedirectToLogin = redirectContext =>
+          {
+            redirectContext.HttpContext.Response.StatusCode = 401;
+            return Task.CompletedTask;
+          }
         };
       });
+
 
       services.AddScoped<IAuthService, AuthService>();
 
@@ -59,7 +65,7 @@ namespace reading_list_api
       }
 
       app.UseCors(x => x
-          .AllowAnyOrigin()
+          .WithOrigins("http://localhost:3000")
           .AllowAnyMethod()
           .AllowAnyHeader()
           .AllowCredentials());
