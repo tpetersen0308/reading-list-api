@@ -22,8 +22,6 @@ namespace test_reading_list_api.ModelsTests
           id = Guid.NewGuid(),
           email = "test email",
           avatar = "test avatar",
-          oauthSubject = "test oauth subject",
-          oauthIssuer = "test oauth issuer"
         });
         context.SaveChanges();
 

@@ -3,3 +3,4 @@
 /test/bin/Debug/*
 /test/obj/Debug/*
 /src/appsettings.json
+.vscode

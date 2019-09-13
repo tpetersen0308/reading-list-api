@@ -1,6 +1,4 @@
 using reading_list_api.Models;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System;
 using System.Linq;
 
