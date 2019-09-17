@@ -23,7 +23,12 @@ namespace reading_list_api
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddCors();
-      services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+      services.AddMvc()
+      .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+      .AddSessionStateTempDataProvider()
+      .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+      services.AddSession();
 
       services.AddEntityFrameworkNpgsql()
         .AddDbContext<ReadingListApiContext>()
@@ -46,9 +51,12 @@ namespace reading_list_api
         };
       });
 
+      services.AddAuthorization();
 
       services.AddScoped<IAuthService, AuthService>();
-
+      services.AddHttpContextAccessor();
+      services.AddScoped<ISessionService, SessionService>();
+      services.AddDistributedMemoryCache();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,6 +77,7 @@ namespace reading_list_api
           .AllowAnyMethod()
           .AllowAnyHeader()
           .AllowCredentials());
+      app.UseSession();
       app.UseAuthentication();
       app.UseMvc();
     }

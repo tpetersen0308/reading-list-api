@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using reading_list_api.Models;
@@ -9,9 +10,10 @@ using reading_list_api.Models;
 namespace reading_list_api.Migrations
 {
     [DbContext(typeof(ReadingListApiContext))]
-    partial class ReadingListApiContextModelSnapshot : ModelSnapshot
+    [Migration("20190917183228_CapitalizeBookColumnNames")]
+    partial class CapitalizeBookColumnNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,31 +32,11 @@ namespace reading_list_api.Migrations
 
                     b.Property<string>("Image");
 
-                    b.Property<Guid?>("ReadingListId");
-
                     b.Property<string>("Title");
 
                     b.HasKey("BookId");
 
-                    b.HasIndex("ReadingListId");
-
                     b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("reading_list_api.Models.ReadingList", b =>
-                {
-                    b.Property<Guid>("ReadingListId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Title");
-
-                    b.Property<Guid?>("UserId");
-
-                    b.HasKey("ReadingListId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ReadingLists");
                 });
 
             modelBuilder.Entity("reading_list_api.Models.User", b =>
@@ -69,20 +51,6 @@ namespace reading_list_api.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("reading_list_api.Models.Book", b =>
-                {
-                    b.HasOne("reading_list_api.Models.ReadingList", "ReadingList")
-                        .WithMany("Books")
-                        .HasForeignKey("ReadingListId");
-                });
-
-            modelBuilder.Entity("reading_list_api.Models.ReadingList", b =>
-                {
-                    b.HasOne("reading_list_api.Models.User", "User")
-                        .WithMany("ReadingLists")
-                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

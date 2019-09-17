@@ -24,14 +24,13 @@ namespace reading_list_api.Services
 
     private User FindUserOrAdd(Google.Apis.Auth.GoogleJsonWebSignature.Payload payload)
     {
-      var u = _context.Users.Where(x => x.email == payload.Email).FirstOrDefault();
+      var u = _context.Users.Where(x => x.Email == payload.Email).FirstOrDefault();
       if (u == null)
       {
         u = new User()
         {
-          id = Guid.NewGuid(),
-          email = payload.Email,
-          avatar = payload.Picture,
+          Email = payload.Email,
+          Avatar = payload.Picture,
         };
         _context.Users.Add(u);
         _context.SaveChanges();

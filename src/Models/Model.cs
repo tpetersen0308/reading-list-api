@@ -11,6 +11,17 @@ namespace reading_list_api.Models
       : base(options)
     { }
     public DbSet<User> Users { get; set; }
+    public DbSet<ReadingList> ReadingLists { get; set; }
+    public DbSet<Book> Books { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<Book>()
+      .Property(e => e.Authors)
+      .HasConversion(
+        v => string.Join(',', v),
+        v => v.Split(',', System.StringSplitOptions.RemoveEmptyEntries));
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

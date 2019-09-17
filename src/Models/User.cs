@@ -1,14 +1,24 @@
+using System;
+using System.Collections.Generic;
+
 namespace reading_list_api.Models
 {
   public class User
   {
-    public System.Guid id { get; set; }
-    public string email { get; set; }
-    public string avatar { get; set; }
+    public Guid UserId { get; set; }
+    public string Email { get; set; }
+    public string Avatar { get; set; }
+    public virtual List<ReadingList> ReadingLists { get; set; }
+
+    public User()
+    {
+      UserId = Guid.NewGuid();
+      ReadingLists = new List<ReadingList>();
+    }
   }
 
   public class UserView
   {
-    public string tokenId { get; set; }
+    public string TokenId { get; set; }
   }
 }
