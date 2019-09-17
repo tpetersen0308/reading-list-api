@@ -1,0 +1,8 @@
+language: csharp
+mono: none
+solution: reading-list-api.sln
+dotnet: 2.2.401
+script:
+  - dotnet restore
+  - dotnet test
+
