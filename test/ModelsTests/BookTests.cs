@@ -2,6 +2,7 @@ using reading_list_api.Models;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using test_reading_list_api.Fixtures;
 
 namespace test_reading_list_api.ModelsTests
 {
@@ -43,21 +44,7 @@ namespace test_reading_list_api.ModelsTests
 
       using (var context = new ReadingListApiContext(options))
       {
-        context.Books.Add(new Book
-        {
-          Title = "On The Plurality Of Worlds",
-          Authors = new string[] { "Rudolf Carnap" },
-          Image = "test image url"
-        });
-        context.SaveChanges();
-
-        context.ReadingLists.Add(new ReadingList
-        {
-          Title = "Existential Meltdown",
-        });
-        context.SaveChanges();
-
-        context.ReadingLists.Last().Books.Add(context.Books.Last());
+        context.ReadingLists.Add(new ReadingListFixture().ReadingList());
         context.SaveChanges();
 
         Book book = context.Books.Last();

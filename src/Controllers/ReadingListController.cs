@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using reading_list_api.Models;
@@ -27,7 +29,25 @@ namespace reading_list_api.Controllers
       currentUser.ReadingLists.Add(newReadingList);
       _context.SaveChanges();
 
-      return Json(_context.ReadingLists.Find(newReadingList.ReadingListId));
+      return Json(newReadingList);
+    }
+
+    [HttpPut("{readingListId}")]
+    public JsonResult Put(string readingListId, Book book)
+    {
+      ReadingList readingList = _context.ReadingLists
+      .Where(r => r.ReadingListId == Guid.Parse(readingListId))
+      .FirstOrDefault();
+
+      if (readingList.UserId != _sessionService.CurrentUser().UserId)
+      {
+        return Json(Unauthorized());
+      }
+
+      readingList.Books.Add(book);
+      _context.SaveChanges();
+
+      return Json(readingList);
     }
   }
 }

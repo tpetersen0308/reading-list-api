@@ -2,7 +2,7 @@ using reading_list_api.Models;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Collections.Generic;
+using test_reading_list_api.Fixtures;
 
 namespace test_reading_list_api.ModelsTests
 {
@@ -24,14 +24,9 @@ namespace test_reading_list_api.ModelsTests
         });
         context.SaveChanges();
 
-        context.ReadingLists.Add(new ReadingList
-        {
-          Title = "Empty Reading List",
-        });
-        context.SaveChanges();
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        context.ReadingLists.Add(readingList);
 
-
-        ReadingList readingList = context.ReadingLists.Last();
         User user = context.Users.Last();
         user.ReadingLists.Add(readingList);
         context.SaveChanges();
@@ -49,35 +44,7 @@ namespace test_reading_list_api.ModelsTests
 
       using (var context = new ReadingListApiContext(options))
       {
-        Book book1 = new Book
-        {
-          Title = "On The Plurality Of Worlds",
-          Authors = new string[] { "Rudolf Carnap" },
-          Image = "test image url"
-        };
-
-        Book book2 = new Book
-        {
-          Title = "An Inquiry Concerning The Principles Of Morals",
-          Authors = new string[] { "David Hume" },
-          Image = "test image url"
-        };
-
-        Book book3 = new Book
-        {
-          Title = "Critique Of Pure Reason",
-          Authors = new string[] { "Immanuel Kant" },
-          Image = "test image url"
-        };
-
-        context.Books.AddRange(new List<Book>() { book1, book2, book3 });
-        context.SaveChanges();
-
-        context.ReadingLists.Add(new ReadingList
-        {
-          Title = "Existential Meltdown",
-          Books = context.Books.ToList()
-        });
+        context.ReadingLists.Add(new ReadingListFixture().ReadingList());
         context.SaveChanges();
 
         ReadingList readingList = context.ReadingLists.Last();
