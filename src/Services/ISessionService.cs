@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using reading_list_api.Models;
 using Microsoft.AspNetCore.Http;
 
@@ -23,7 +25,10 @@ namespace reading_list_api.Services
     public User CurrentUser()
     {
       string userId = _contextAccessor.HttpContext.Session.GetString("userId");
-      User currentUser = _dbContext.Users.Find(Guid.Parse(userId));
+      User currentUser = _dbContext.Users
+      .Where(u => u.UserId == Guid.Parse(userId))
+      .Include(u => u.ReadingLists)
+      .FirstOrDefault();
       return currentUser;
     }
   }

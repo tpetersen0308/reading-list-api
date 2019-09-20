@@ -25,8 +25,7 @@ namespace reading_list_api
       services.AddCors();
       services.AddMvc()
       .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-      .AddSessionStateTempDataProvider()
-      .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+      .AddSessionStateTempDataProvider();
 
       services.AddSession();
 

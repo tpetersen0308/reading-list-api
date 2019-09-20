@@ -23,25 +23,11 @@ namespace reading_list_api.Controllers
     public JsonResult Post(ReadingList readingList)
     {
       User currentUser = _sessionService.CurrentUser();
-      ReadingList newReadingList = new ReadingList
-      {
-        Title = readingList.Title,
-        User = currentUser
-      };
-      _context.ReadingLists.Add(newReadingList);
-
-      Book newBook = new Book
-      {
-        Title = readingList.Books[0].Title,
-        Authors = readingList.Books[0].Authors,
-        Image = readingList.Books[0].Image,
-        ReadingList = newReadingList
-      };
-      _context.Books.Add(newBook);
+      ReadingList newReadingList = _context.ReadingLists.Add(readingList).Entity;
+      currentUser.ReadingLists.Add(newReadingList);
       _context.SaveChanges();
 
-
-      return Json(newReadingList);
+      return Json(_context.ReadingLists.Find(newReadingList.ReadingListId));
     }
   }
 }

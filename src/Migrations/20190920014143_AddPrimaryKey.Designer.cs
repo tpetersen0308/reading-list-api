@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using reading_list_api.Models;
@@ -9,9 +10,10 @@ using reading_list_api.Models;
 namespace reading_list_api.Migrations
 {
     [DbContext(typeof(ReadingListApiContext))]
-    partial class ReadingListApiContextModelSnapshot : ModelSnapshot
+    [Migration("20190920014143_AddPrimaryKey")]
+    partial class AddPrimaryKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,7 +32,7 @@ namespace reading_list_api.Migrations
 
                     b.Property<string>("Image");
 
-                    b.Property<Guid>("ReadingListId");
+                    b.Property<Guid?>("ReadingListId");
 
                     b.Property<string>("Title");
 
@@ -48,7 +50,7 @@ namespace reading_list_api.Migrations
 
                     b.Property<string>("Title");
 
-                    b.Property<Guid>("UserId");
+                    b.Property<Guid?>("UserId");
 
                     b.HasKey("ReadingListId");
 
@@ -75,16 +77,14 @@ namespace reading_list_api.Migrations
                 {
                     b.HasOne("reading_list_api.Models.ReadingList", "ReadingList")
                         .WithMany("Books")
-                        .HasForeignKey("ReadingListId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ReadingListId");
                 });
 
             modelBuilder.Entity("reading_list_api.Models.ReadingList", b =>
                 {
                     b.HasOne("reading_list_api.Models.User", "User")
                         .WithMany("ReadingLists")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

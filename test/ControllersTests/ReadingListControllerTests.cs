@@ -24,6 +24,8 @@ namespace test_reading_list_api.ControllersTests
           Email = "test email",
           Avatar = "test avatar"
         };
+        context.Users.Add(user);
+        context.SaveChanges();
 
         SessionServiceStub sessionService = new SessionServiceStub(user);
         ReadingListController controller = new ReadingListController(context, sessionService);
@@ -48,6 +50,8 @@ namespace test_reading_list_api.ControllersTests
         Assert.Equal(1, context.ReadingLists.Count());
         Assert.Equal(1, context.Books.Count());
         Assert.Equal(user, expectedResult.User);
+        Assert.Equal(expectedResult, context.Books.Last().ReadingList);
+        Assert.Equal(expectedResult, context.Users.Last().ReadingLists[0]);
         Assert.Equal(expectedResult, context.Books.Last().ReadingList);
       }
     }

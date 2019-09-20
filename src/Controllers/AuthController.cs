@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
 using reading_list_api.Models;
 using reading_list_api.Helpers;
 using reading_list_api.Services;
-using Microsoft.AspNetCore.Authentication;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace reading_list_api.Controllers
@@ -46,7 +46,7 @@ namespace reading_list_api.Controllers
 
         return Ok(new
         {
-          user = user
+          user = _sessionService.CurrentUser()
         });
       }
       catch (Exception ex)
