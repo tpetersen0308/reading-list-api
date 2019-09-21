@@ -1,12 +1,12 @@
-using reading_list_api.Services;
+using reading_list_api.Helpers;
 using reading_list_api.Models;
 
 namespace test_reading_list_api.Stubs
 {
-  public class SessionServiceStub : ISessionService
+  public class SessionHelperStub : ISessionHelper
   {
     private readonly User _user;
-    public SessionServiceStub(User user)
+    public SessionHelperStub(User user)
     {
       this._user = user;
     }

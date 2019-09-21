@@ -15,12 +15,12 @@ namespace reading_list_api.Controllers
   public class AuthController : Controller
   {
     private readonly IAuthService _authService;
-    private readonly ISessionService _sessionService;
+    private readonly ISessionHelper _session;
 
-    public AuthController(IAuthService authService, ISessionService sessionService)
+    public AuthController(IAuthService authService, ISessionHelper session)
     {
       this._authService = authService;
-      this._sessionService = sessionService;
+      this._session = session;
     }
 
     [HttpPost("google")]
@@ -30,7 +30,6 @@ namespace reading_list_api.Controllers
       {
         Payload payload = ValidateAsync(userView.TokenId, new ValidationSettings()).Result;
         User user = _authService.Authenticate(payload);
-        SimpleLogger.Log(payload.ExpirationTimeSeconds.ToString());
 
         ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
         {
@@ -41,12 +40,10 @@ namespace reading_list_api.Controllers
 
         await Request.HttpContext.SignInAsync("Cookies", claimsPrincipal);
         HttpContext.Session.SetString("userId", user.UserId.ToString());
-        HttpContext.Session.GetString("userId");
-
 
         return Ok(new
         {
-          user = _sessionService.CurrentUser()
+          user = _session.CurrentUser()
         });
       }
       catch (Exception ex)

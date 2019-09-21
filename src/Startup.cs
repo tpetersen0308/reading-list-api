@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using reading_list_api.Models;
 using reading_list_api.Services;
+using reading_list_api.Helpers;
 
 namespace reading_list_api
 {
@@ -54,7 +55,7 @@ namespace reading_list_api
 
       services.AddScoped<IAuthService, AuthService>();
       services.AddHttpContextAccessor();
-      services.AddScoped<ISessionService, SessionService>();
+      services.AddScoped<ISessionHelper, SessionHelper>();
       services.AddDistributedMemoryCache();
     }
 

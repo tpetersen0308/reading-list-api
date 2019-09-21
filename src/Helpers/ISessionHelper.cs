@@ -4,19 +4,19 @@ using Microsoft.EntityFrameworkCore;
 using reading_list_api.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace reading_list_api.Services
+namespace reading_list_api.Helpers
 {
-  public interface ISessionService
+  public interface ISessionHelper
   {
     User CurrentUser();
   }
 
-  public class SessionService : ISessionService
+  public class SessionHelper : ISessionHelper
   {
     private readonly ReadingListApiContext _dbContext;
     private readonly IHttpContextAccessor _contextAccessor;
 
-    public SessionService(ReadingListApiContext dbContext, IHttpContextAccessor contextAccessor)
+    public SessionHelper(ReadingListApiContext dbContext, IHttpContextAccessor contextAccessor)
     {
       this._dbContext = dbContext;
       this._contextAccessor = contextAccessor;

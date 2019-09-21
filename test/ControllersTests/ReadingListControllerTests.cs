@@ -13,6 +13,75 @@ namespace test_reading_list_api.ControllersTests
   public class ReadingListControllerTests
   {
     [Fact]
+    public void ReturnsAReadingList()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("returns_a_reading_list")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        User user = new User
+        {
+          Email = "test email",
+          Avatar = "test avatar"
+        };
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        user.ReadingLists.Add(readingList);
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        SessionHelperStub session = new SessionHelperStub(user);
+        ReadingListController controller = new ReadingListController(context, session);
+
+
+        JsonResult result = controller.Get(readingList.ReadingListId.ToString()) as JsonResult;
+
+        Assert.Equal(readingList, result.Value);
+      }
+    }
+
+    [Fact]
+    public void ShowReturns401WhenUserDoesntOwnList()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("show_returns_401")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        User user = new User
+        {
+          Email = "test email",
+          Avatar = "test avatar",
+        };
+        User unauthorizedUser = new User
+        {
+          Email = "unauthorized test email",
+          Avatar = "unauthorized test avatar",
+        };
+        user.ReadingLists.Add(readingList);
+        context.Users.AddRange(new List<User>() { user, unauthorizedUser });
+        context.SaveChanges();
+
+        SessionHelperStub session = new SessionHelperStub(unauthorizedUser);
+        ReadingListController controller = new ReadingListController(context, session);
+
+        Book newBook = new Book
+        {
+          Title = "The Philosophical Foundations of Physics",
+          Authors = new string[] { "Rudolf Carnap" },
+          Image = "test image url"
+        };
+
+        JsonResult result = controller.Get(readingList.ReadingListId.ToString()) as JsonResult;
+
+        Assert.IsType<UnauthorizedResult>(result.Value);
+      }
+    }
+
+    [Fact]
     public void CreatesNewReadingList()
     {
       var options = new DbContextOptionsBuilder<ReadingListApiContext>()
@@ -29,8 +98,8 @@ namespace test_reading_list_api.ControllersTests
         context.Users.Add(user);
         context.SaveChanges();
 
-        SessionServiceStub sessionService = new SessionServiceStub(user);
-        ReadingListController controller = new ReadingListController(context, sessionService);
+        SessionHelperStub session = new SessionHelperStub(user);
+        ReadingListController controller = new ReadingListController(context, session);
 
         ReadingList readingList = new ReadingListFixture().ReadingList();
 
@@ -61,8 +130,8 @@ namespace test_reading_list_api.ControllersTests
         context.Users.Add(user);
         context.SaveChanges();
 
-        SessionServiceStub sessionService = new SessionServiceStub(user);
-        ReadingListController controller = new ReadingListController(context, sessionService);
+        SessionHelperStub session = new SessionHelperStub(user);
+        ReadingListController controller = new ReadingListController(context, session);
 
         Book newBook = new Book
         {
@@ -84,10 +153,10 @@ namespace test_reading_list_api.ControllersTests
     }
 
     [Fact]
-    public void Returns401WhenUserDoesntOwnList()
+    public void CreateReturns401WhenUserDoesntOwnList()
     {
       var options = new DbContextOptionsBuilder<ReadingListApiContext>()
-      .UseInMemoryDatabase("adds_book_to_existing_reading_list")
+      .UseInMemoryDatabase("create_returns_401")
       .Options;
 
       using (var context = new ReadingListApiContext(options))
@@ -107,8 +176,8 @@ namespace test_reading_list_api.ControllersTests
         context.Users.AddRange(new List<User>() { user, unauthorizedUser });
         context.SaveChanges();
 
-        SessionServiceStub sessionService = new SessionServiceStub(unauthorizedUser);
-        ReadingListController controller = new ReadingListController(context, sessionService);
+        SessionHelperStub session = new SessionHelperStub(unauthorizedUser);
+        ReadingListController controller = new ReadingListController(context, session);
 
         Book newBook = new Book
         {
