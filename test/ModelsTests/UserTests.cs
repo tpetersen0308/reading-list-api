@@ -1,4 +1,5 @@
 using reading_list_api.Models;
+using test_reading_list_api.Fixtures;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -16,11 +17,7 @@ namespace test_reading_list_api.ModelsTests
 
       using (var context = new ReadingListApiContext(options))
       {
-        context.Users.Add(new User
-        {
-          Email = "test email",
-          Avatar = "test avatar",
-        });
+        context.Users.Add(new UserFixture().User());
         context.SaveChanges();
 
         Assert.Equal(1, context.Users.Count());

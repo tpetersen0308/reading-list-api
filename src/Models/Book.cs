@@ -18,6 +18,7 @@ namespace reading_list_api.Models
     public string Title { get; set; }
     public string Image { get; set; }
     public string[] Authors { get; set; }
+    public int Ranking { get; set; }
     public Guid ReadingListId { get; set; }
     [JsonIgnore]
     public virtual ReadingList ReadingList { get; set; }

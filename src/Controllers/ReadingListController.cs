@@ -23,14 +23,11 @@ namespace reading_list_api.Controllers
     }
 
     [HttpGet("{readingListId}")]
-    public JsonResult Get(string readingListId)
+    public JsonResult Get(Guid readingListId)
     {
-      ReadingList readingList = _context.ReadingLists
-      .Where(r => r.ReadingListId == Guid.Parse(readingListId))
-      .Include(r => r.Books)
-      .FirstOrDefault();
+      ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!readingListBelongsToCurrentUser(readingList.UserId))
+      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
       {
         return Json(Unauthorized());
       }
@@ -42,6 +39,7 @@ namespace reading_list_api.Controllers
     public JsonResult Post(ReadingList readingList)
     {
       User currentUser = _session.CurrentUser();
+      readingList.Books[0].Ranking = 1;
       ReadingList newReadingList = _context.ReadingLists.Add(readingList).Entity;
       currentUser.ReadingLists.Add(newReadingList);
       _context.SaveChanges();
@@ -50,27 +48,49 @@ namespace reading_list_api.Controllers
     }
 
     [HttpPut("{readingListId}")]
-    public JsonResult Put(string readingListId, Book book)
+    public JsonResult Put(Guid readingListId, Book book)
     {
-      ReadingList readingList = _context.ReadingLists
-      .Where(r => r.ReadingListId == Guid.Parse(readingListId))
-      .FirstOrDefault();
+      ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!readingListBelongsToCurrentUser(readingList.UserId))
+      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
       {
         return Json(Unauthorized());
       }
 
+      book.Ranking = readingList.Books.Count() + 1;
       readingList.Books.Add(book);
       _context.SaveChanges();
 
       return Json(readingList);
     }
 
-    private Boolean readingListBelongsToCurrentUser(Guid ownerId)
+    [HttpPatch("{readingListId}")]
+    public JsonResult Patch(Guid readingListId, PatchData patchData)
+    {
+      ReadingList readingList = LoadReadingList(readingListId);
+
+      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      {
+        return Json(Unauthorized());
+      }
+
+      readingList.UpdateRankings(patchData.BookId, patchData.Ranking);
+      _context.SaveChanges();
+
+      return Json(readingList);
+    }
+
+    private ReadingList LoadReadingList(Guid readingListId)
+    {
+      return _context.ReadingLists
+      .Where(r => r.ReadingListId == readingListId)
+      .Include(r => r.Books)
+      .FirstOrDefault();
+    }
+
+    private Boolean ReadingListBelongsToCurrentUser(Guid ownerId)
     {
       return ownerId == _session.CurrentUser().UserId;
     }
-
   }
 }

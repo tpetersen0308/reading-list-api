@@ -17,11 +17,7 @@ namespace test_reading_list_api.ModelsTests
 
       using (var context = new ReadingListApiContext(options))
       {
-        context.Users.Add(new User
-        {
-          Email = "test email",
-          Avatar = "test avatar",
-        });
+        context.Users.Add(new UserFixture().User());
         context.SaveChanges();
 
         ReadingList readingList = new ReadingListFixture().ReadingList();
@@ -49,6 +45,52 @@ namespace test_reading_list_api.ModelsTests
 
         ReadingList readingList = context.ReadingLists.Last();
         Assert.Equal(3, readingList.Books.Count());
+      }
+    }
+
+    [Fact]
+    public void CanDemoteBookRanking()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("can_demote_book_ranking")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        context.Add(readingList);
+        context.SaveChanges();
+        Book book1 = readingList.Books[0];
+        Book book2 = readingList.Books[1];
+        Book book3 = readingList.Books[2];
+        readingList.UpdateRankings(book1.BookId, 2);
+
+        Assert.Equal(2, book1.Ranking);
+        Assert.Equal(1, book2.Ranking);
+        Assert.Equal(3, book3.Ranking);
+      }
+    }
+
+    [Fact]
+    public void CanPromoteBookRanking()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("can_promote_book_ranking")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        context.Add(readingList);
+        context.SaveChanges();
+        Book book1 = readingList.Books[0];
+        Book book2 = readingList.Books[1];
+        Book book3 = readingList.Books[2];
+        readingList.UpdateRankings(book3.BookId, 2);
+
+        Assert.Equal(1, book1.Ranking);
+        Assert.Equal(3, book2.Ranking);
+        Assert.Equal(2, book3.Ranking);
       }
     }
   }

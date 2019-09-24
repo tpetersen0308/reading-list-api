@@ -17,21 +17,14 @@ namespace test_reading_list_api.ModelsTests
 
       using (var context = new ReadingListApiContext(options))
       {
-        string[] authors = new string[] { "Rudolf Carnap" };
-
-        context.Books.Add(new Book
-        {
-          Title = "On The Plurality Of Worlds",
-          Authors = authors,
-          Image = "test image url"
-        });
+        context.Books.Add(new BookFixture().Book());
 
         context.SaveChanges();
 
         Book book = context.Books.Last();
         Assert.Equal(1, context.Books.Count());
         Assert.Equal("On The Plurality Of Worlds", book.Title);
-        Assert.Equal("Rudolf Carnap", book.Authors[0]);
+        Assert.Equal("David Lewis", book.Authors[0]);
       }
     }
 
