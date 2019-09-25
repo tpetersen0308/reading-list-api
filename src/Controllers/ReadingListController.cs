@@ -79,6 +79,25 @@ namespace reading_list_api.Controllers
       return Json(readingList);
     }
 
+    [HttpDelete("{readingListId}")]
+    public JsonResult Delete(Guid readingListId)
+    {
+      ReadingList readingList = LoadReadingList(readingListId);
+
+      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      {
+        return Json(Unauthorized());
+      }
+
+      _context.ReadingLists.Remove(readingList);
+      _context.SaveChanges();
+
+      return Json(NoContent());
+      {
+
+      }
+    }
+
     [HttpDelete("{readingListId}/{bookId}")]
     public JsonResult Delete(Guid readingListId, Guid bookId)
     {

@@ -239,7 +239,7 @@ namespace test_reading_list_api.ControllersTests
     public void DeletesABook()
     {
       var options = new DbContextOptionsBuilder<ReadingListApiContext>()
-      .UseInMemoryDatabase("returns_a_reading_list")
+      .UseInMemoryDatabase("deletes_a_book")
       .Options;
 
       using (var context = new ReadingListApiContext(options))
@@ -263,7 +263,7 @@ namespace test_reading_list_api.ControllersTests
     }
 
     [Fact]
-    public void DeleteReturns401WhenUserDoesntOwnList()
+    public void DeleteBookReturns401WhenUserDoesntOwnList()
     {
       var options = new DbContextOptionsBuilder<ReadingListApiContext>()
       .UseInMemoryDatabase("delete_returns_401")
@@ -288,6 +288,62 @@ namespace test_reading_list_api.ControllersTests
         Guid bookId = readingList.Books[1].BookId;
 
         JsonResult result = controller.Delete(readingList.ReadingListId, bookId) as JsonResult;
+
+        Assert.IsType<UnauthorizedResult>(result.Value);
+      }
+    }
+
+    [Fact]
+    public void DeletesAReadingList()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("deletes_a_reading_list")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        User user = new UserFixture().User();
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        user.ReadingLists.Add(readingList);
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        SessionHelperStub session = new SessionHelperStub(user);
+        ReadingListController controller = new ReadingListController(context, session);
+
+        Guid readingListId = readingList.ReadingListId;
+
+        JsonResult result = controller.Delete(readingList.ReadingListId);
+
+        Assert.Equal(0, context.ReadingLists.Count());
+        Assert.Equal(null, context.ReadingLists.Where(r => r.ReadingListId == readingListId).FirstOrDefault());
+      }
+    }
+
+    [Fact]
+    public void DeleteListReturns401WhenUserDoesntOwnList()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("delete_returns_401")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        User user = new UserFixture().User();
+        User unauthorizedUser = new User
+        {
+          Email = "unauthorized test email",
+          Avatar = "unauthorized test avatar",
+        };
+        user.ReadingLists.Add(readingList);
+        context.Users.AddRange(new List<User>() { user, unauthorizedUser });
+        context.SaveChanges();
+
+        SessionHelperStub session = new SessionHelperStub(unauthorizedUser);
+        ReadingListController controller = new ReadingListController(context, session);
+
+        JsonResult result = controller.Delete(readingList.ReadingListId) as JsonResult;
 
         Assert.IsType<UnauthorizedResult>(result.Value);
       }
