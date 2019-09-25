@@ -93,5 +93,28 @@ namespace test_reading_list_api.ModelsTests
         Assert.Equal(2, book3.Ranking);
       }
     }
+
+    [Fact]
+    public void CanUpdateRankingsOnBookRemoval()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("can_update_rankings_on_book_removal")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        context.Add(readingList);
+        context.SaveChanges();
+        Book book1 = readingList.Books[0];
+        Book book2 = readingList.Books[1];
+        Book book3 = readingList.Books[2];
+        readingList.RemoveBook(book1.BookId);
+
+        Assert.Equal(2, readingList.Books.Count());
+        Assert.Equal(1, book2.Ranking);
+        Assert.Equal(2, book3.Ranking);
+      }
+    }
   }
 }

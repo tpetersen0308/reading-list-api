@@ -18,11 +18,20 @@ namespace reading_list_api.Models
     public Guid ReadingListId { get; set; }
     [Required]
     public string Title { get; set; }
-    [MinLength(1)]
     public virtual List<Book> Books { get; set; }
     public Guid UserId { get; set; }
     [JsonIgnore]
     public virtual User User { get; set; }
+
+    public ReadingList RemoveBook(Guid bookId)
+    {
+      Book book = this.Books.Find(b => b.BookId == bookId);
+
+      DemoteBook(book.Ranking, this.Books.Count);
+      this.Books.Remove(book);
+
+      return this;
+    }
 
     public ReadingList UpdateRankings(Guid bookId, int newRanking)
     {

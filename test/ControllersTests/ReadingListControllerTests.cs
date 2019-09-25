@@ -234,5 +234,64 @@ namespace test_reading_list_api.ControllersTests
         Assert.IsType<UnauthorizedResult>(result.Value);
       }
     }
+
+    [Fact]
+    public void DeletesABook()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("returns_a_reading_list")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        User user = new UserFixture().User();
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        user.ReadingLists.Add(readingList);
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        SessionHelperStub session = new SessionHelperStub(user);
+        ReadingListController controller = new ReadingListController(context, session);
+
+        Guid bookId = readingList.Books[1].BookId;
+
+        JsonResult result = controller.Delete(readingList.ReadingListId, bookId);
+
+        Assert.Equal(2, readingList.Books.Count);
+        Assert.Equal(null, context.Books.Where(b => b.BookId == bookId).FirstOrDefault());
+      }
+    }
+
+    [Fact]
+    public void DeleteReturns401WhenUserDoesntOwnList()
+    {
+      var options = new DbContextOptionsBuilder<ReadingListApiContext>()
+      .UseInMemoryDatabase("delete_returns_401")
+      .Options;
+
+      using (var context = new ReadingListApiContext(options))
+      {
+        ReadingList readingList = new ReadingListFixture().ReadingList();
+        User user = new UserFixture().User();
+        User unauthorizedUser = new User
+        {
+          Email = "unauthorized test email",
+          Avatar = "unauthorized test avatar",
+        };
+        user.ReadingLists.Add(readingList);
+        context.Users.AddRange(new List<User>() { user, unauthorizedUser });
+        context.SaveChanges();
+
+        SessionHelperStub session = new SessionHelperStub(unauthorizedUser);
+        ReadingListController controller = new ReadingListController(context, session);
+
+        Guid bookId = readingList.Books[1].BookId;
+
+        JsonResult result = controller.Delete(readingList.ReadingListId, bookId) as JsonResult;
+
+        Assert.IsType<UnauthorizedResult>(result.Value);
+      }
+    }
+
   }
 }

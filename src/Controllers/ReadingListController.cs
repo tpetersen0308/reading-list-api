@@ -40,11 +40,10 @@ namespace reading_list_api.Controllers
     {
       User currentUser = _session.CurrentUser();
       readingList.Books[0].Ranking = 1;
-      ReadingList newReadingList = _context.ReadingLists.Add(readingList).Entity;
-      currentUser.ReadingLists.Add(newReadingList);
+      currentUser.ReadingLists.Add(readingList);
       _context.SaveChanges();
 
-      return Json(newReadingList);
+      return Json(readingList);
     }
 
     [HttpPut("{readingListId}")]
@@ -75,6 +74,22 @@ namespace reading_list_api.Controllers
       }
 
       readingList.UpdateRankings(patchData.BookId, patchData.Ranking);
+      _context.SaveChanges();
+
+      return Json(readingList);
+    }
+
+    [HttpDelete("{readingListId}/{bookId}")]
+    public JsonResult Delete(Guid readingListId, Guid bookId)
+    {
+      ReadingList readingList = LoadReadingList(readingListId);
+
+      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      {
+        return Json(Unauthorized());
+      }
+
+      readingList.RemoveBook(bookId);
       _context.SaveChanges();
 
       return Json(readingList);
