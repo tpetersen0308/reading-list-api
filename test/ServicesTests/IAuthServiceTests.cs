@@ -10,10 +10,10 @@ namespace test_reading_list_api.ServicesTests
   public class IAuthServiceTest
   {
     [Fact]
-    public void AddsUserToDatabase()
+    public void CreatesNewUser()
     {
       var options = new DbContextOptionsBuilder<ReadingListApiContext>()
-      .UseInMemoryDatabase("adds_user_to_database")
+      .UseInMemoryDatabase("creates_new_user")
       .Options;
 
       using (var context = new ReadingListApiContext(options))
@@ -25,6 +25,8 @@ namespace test_reading_list_api.ServicesTests
         };
 
         AuthService auth = new AuthService(context);
+
+        auth.Authenticate(payload);
 
         Assert.Equal(1, context.Users.Count());
         Assert.Equal("test email", context.Users.Last().Email);
