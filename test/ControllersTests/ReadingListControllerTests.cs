@@ -61,9 +61,9 @@ namespace test_reading_list_api.ControllersTests
         SessionHelperStub session = new SessionHelperStub(unauthorizedUser);
         ReadingListController controller = new ReadingListController(context, session);
 
-        JsonResult result = controller.Get(readingList.ReadingListId) as JsonResult;
+        var result = controller.Get(readingList.ReadingListId);
 
-        Assert.IsType<UnauthorizedResult>(result.Value);
+        Assert.IsType<NotFoundResult>(result);
       }
     }
 
@@ -158,9 +158,9 @@ namespace test_reading_list_api.ControllersTests
 
         Book newBook = new BookFixture().Book();
 
-        JsonResult result = controller.Put(readingList.ReadingListId, newBook) as JsonResult;
+        var result = controller.Put(readingList.ReadingListId, newBook);
 
-        Assert.IsType<UnauthorizedResult>(result.Value);
+        Assert.IsType<NotFoundResult>(result);
       }
     }
 
@@ -229,9 +229,9 @@ namespace test_reading_list_api.ControllersTests
           Ranking = 2
         };
 
-        JsonResult result = controller.Patch(readingList.ReadingListId, data) as JsonResult;
+        var result = controller.Patch(readingList.ReadingListId, data);
 
-        Assert.IsType<UnauthorizedResult>(result.Value);
+        Assert.IsType<NotFoundResult>(result);
       }
     }
 
@@ -255,7 +255,7 @@ namespace test_reading_list_api.ControllersTests
 
         Guid bookId = readingList.Books[1].BookId;
 
-        JsonResult result = controller.Delete(readingList.ReadingListId, bookId);
+        var result = controller.Delete(readingList.ReadingListId, bookId);
 
         Assert.Equal(2, readingList.Books.Count);
         Assert.Equal(null, context.Books.Where(b => b.BookId == bookId).FirstOrDefault());
@@ -287,9 +287,9 @@ namespace test_reading_list_api.ControllersTests
 
         Guid bookId = readingList.Books[1].BookId;
 
-        JsonResult result = controller.Delete(readingList.ReadingListId, bookId) as JsonResult;
+        var result = controller.Delete(readingList.ReadingListId, bookId);
 
-        Assert.IsType<UnauthorizedResult>(result.Value);
+        Assert.IsType<NotFoundResult>(result);
       }
     }
 
@@ -313,7 +313,7 @@ namespace test_reading_list_api.ControllersTests
 
         Guid readingListId = readingList.ReadingListId;
 
-        JsonResult result = controller.Delete(readingList.ReadingListId);
+        var result = controller.Delete(readingList.ReadingListId);
 
         Assert.Equal(0, context.ReadingLists.Count());
         Assert.Equal(null, context.ReadingLists.Where(r => r.ReadingListId == readingListId).FirstOrDefault());
@@ -343,9 +343,9 @@ namespace test_reading_list_api.ControllersTests
         SessionHelperStub session = new SessionHelperStub(unauthorizedUser);
         ReadingListController controller = new ReadingListController(context, session);
 
-        JsonResult result = controller.Delete(readingList.ReadingListId) as JsonResult;
+        var result = controller.Delete(readingList.ReadingListId);
 
-        Assert.IsType<UnauthorizedResult>(result.Value);
+        Assert.IsType<NotFoundResult>(result);
       }
     }
 
