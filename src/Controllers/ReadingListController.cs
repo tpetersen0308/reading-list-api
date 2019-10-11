@@ -23,13 +23,13 @@ namespace reading_list_api.Controllers
     }
 
     [HttpGet("{readingListId}")]
-    public JsonResult Get(Guid readingListId)
+    public ActionResult Get(Guid readingListId)
     {
       ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      if (readingList == null)
       {
-        return Json(Unauthorized());
+        return new NotFoundResult();
       }
 
       return Json(readingList);
@@ -47,13 +47,13 @@ namespace reading_list_api.Controllers
     }
 
     [HttpPut("{readingListId}")]
-    public JsonResult Put(Guid readingListId, Book book)
+    public ActionResult Put(Guid readingListId, Book book)
     {
       ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      if (readingList == null)
       {
-        return Json(Unauthorized());
+        return new NotFoundResult();
       }
 
       book.Ranking = readingList.Books.Count() + 1;
@@ -64,13 +64,13 @@ namespace reading_list_api.Controllers
     }
 
     [HttpPatch("{readingListId}")]
-    public JsonResult Patch(Guid readingListId, PatchData patchData)
+    public ActionResult Patch(Guid readingListId, PatchData patchData)
     {
       ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      if (readingList == null)
       {
-        return Json(Unauthorized());
+        return new NotFoundResult();
       }
 
       readingList.UpdateRankings(patchData.BookId, patchData.Ranking);
@@ -80,32 +80,29 @@ namespace reading_list_api.Controllers
     }
 
     [HttpDelete("{readingListId}")]
-    public JsonResult Delete(Guid readingListId)
+    public ActionResult Delete(Guid readingListId)
     {
       ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      if (readingList == null)
       {
-        return Json(Unauthorized());
+        return new NotFoundResult();
       }
 
       _context.ReadingLists.Remove(readingList);
       _context.SaveChanges();
 
       return Json(NoContent());
-      {
-
-      }
     }
 
     [HttpDelete("{readingListId}/{bookId}")]
-    public JsonResult Delete(Guid readingListId, Guid bookId)
+    public ActionResult Delete(Guid readingListId, Guid bookId)
     {
       ReadingList readingList = LoadReadingList(readingListId);
 
-      if (!ReadingListBelongsToCurrentUser(readingList.UserId))
+      if (readingList == null)
       {
-        return Json(Unauthorized());
+        return new NotFoundResult();
       }
 
       readingList.RemoveBook(bookId);
@@ -116,8 +113,10 @@ namespace reading_list_api.Controllers
 
     private ReadingList LoadReadingList(Guid readingListId)
     {
+      Guid currentUserId = _session.CurrentUser().UserId;
       return _context.ReadingLists
       .Where(r => r.ReadingListId == readingListId)
+      .Where(r => r.UserId == currentUserId)
       .Include(r => r.Books)
       .FirstOrDefault();
     }
